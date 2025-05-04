@@ -5,6 +5,13 @@ This changelog is automatically generated and updated by release-please:
 https://github.com/googleapis/release-please 
 -->
 
+## [0.0.3](https://github.com/Yuzu02/YuuLogger/compare/yuulogger-v0.0.2...yuulogger-v0.0.3) (2025-05-04)
+
+
+### Features
+
+* **Logger:** :sparkles: Add static configuration and retrieval methods for logger options ([34b0d0d](https://github.com/Yuzu02/YuuLogger/commit/34b0d0db92274501841990318c9f86b8f88a9405))
+
 ## [0.0.2](https://github.com/Yuzu02/YuuLogger/compare/yuulogger-v0.0.1...yuulogger-v0.0.2) (2025-05-04)
 
 
