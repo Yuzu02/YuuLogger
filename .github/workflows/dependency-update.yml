@@ -1,0 +1,42 @@
+name: Dependency Update
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run every Sunday at midnight
+  workflow_dispatch:     # Allow manual execution
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest 
+
+      - name: Check for outdated dependencies
+        id: outdated
+        run: |
+          echo "::set-output name=outdated::$(bun outdated --format=json)"
+      
+      - name: Create Pull Request for dependency updates
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GHTOKEN }}
+          commit-message: "chore(deps): update dependencies"
+          title: "chore(deps): update dependencies"
+          body: |
+            Automatic dependency update by GitHub Actions
+            
+            Outdated dependencies:
+            ${{ steps.outdated.outputs.outdated }}
+          branch: "dependency-update"
+          base: "main"

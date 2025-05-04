@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "yuulogger": {
+      "type": "library",
+      "root": ".",
+      "entryFile": "index",
+      "sourceRoot": "src",
+      "compilerOptions": {
+        "webpack": true,
+        "assets": [
+          {
+            "include": "README.md"
+          }
+        ],
+        "tsConfigPath": "tsconfig.lib.json"
+      }
+    }
+  }
+}

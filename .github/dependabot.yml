@@ -1,0 +1,38 @@
+version: 2
+updates:
+  # Keep npm dependencies up to date
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    # Use specific labels on Dependabot PRs
+    labels:
+      - "dependencies"
+      - "npm"
+    # Assign compatible versions according to semver
+    versioning-strategy: auto
+    # Group minor and patch updates
+    groups:
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "jest*"
+          - "ts-*"
+      production-dependencies:
+        patterns:
+          - "nest-winston"
+          - "winston*"
+      nestjs-dependencies:
+        patterns:
+          - "@nestjs/*"
+    
+  # Also check for updates in GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "github-actions"

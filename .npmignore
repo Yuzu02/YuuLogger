@@ -1,0 +1,24 @@
+# Source
+/src
+/test
+/logs
+
+# Configuration
+.github
+.gitignore
+.editorconfig
+biome.json
+jest.config.js
+tsconfig.json
+tsconfig.lib.json
+
+# CI/CD
+.github/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+logs
+*.log

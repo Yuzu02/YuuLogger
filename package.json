@@ -1,0 +1,95 @@
+{
+  "name": "yuulogger",
+  "private": false,
+  "version": "0.0.1",
+  "description": "NestJS Logging Library",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yuzu02/YuuLogger.git"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "homepage": "https://github.com/Yuzu02/YuuLogger#readme",
+  "publishConfig": {
+    "access": "public",
+    "tag": "beta"
+  },
+  "scripts": {
+    "lint": "biome lint --write",
+    "format": "biome format --write",
+    "check": "biome check --write",
+    "all": "biome check --write && biome format --write && biome lint --write",
+    "test": "jest --no-cache",
+    "test:coverage": "jest --coverage",
+    "build:lib": "nest build yuu-log",
+    "build": "tsc -p tsconfig.lib.json",
+    "prepublishOnly": "npm run build",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "nestjs",
+    "logging",
+    "library"
+  ],
+  "author": "Yuzu02",
+  "displayName": "YuuLogger",
+  "license": "MIT",
+  "bugs": {
+    "email": "Yuzu_02@outlook.com",
+    "url": "git+https://github.com/Yuzu02/YuuLogger.git/issues"
+  },
+  "dependencies": {
+    "@logtail/node": "^0.5.4",
+    "@logtail/winston": "^0.5.4",
+    "nest-winston": "^1.10.2",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.1.0",
+    "@nestjs/core": "^11.1.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@fastify/express": "^4.0.2",
+    "@nestjs/cli": "^11.0.7",
+    "@nestjs/common": "^11.1.0",
+    "@nestjs/core": "^11.1.0",
+    "@nestjs/testing": "^11.1.0",
+    "@types/express": "^5.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.3",
+    "fastify": "^5.3.2",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.5.1",
+    "reflect-metadata": "^0.2.2",
+    "release-please": "^17.0.0",
+    "rxjs": "^7.8.2",
+    "ts-jest": "^29.3.2",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
+    "webpack": "^5.99.7"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "biome check --files-ignore-unknown=true",
+      "biome check --write --no-errors-on-unmatched",
+      "biome check --write --organize-imports-enabled=true --no-errors-on-unmatched",
+      "biome check --write --unsafe --no-errors-on-unmatched",
+      "biome format --write --no-errors-on-unmatched",
+      "biome lint --write --no-errors-on-unmatched"
+    ],
+    "*": [
+      "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
+    ]
+  }
+}
