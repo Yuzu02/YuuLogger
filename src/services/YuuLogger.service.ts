@@ -65,6 +65,18 @@ export class YuuLogService implements NestLoggerService {
   private logtail: Logtail | null = null;
   private enabledLogLevels: LogLevel[];
 
+  private static loggerOptions: YuuLogOptions = {
+    appName: "NestJS",
+    logLevels: ["error", "warn", "info"],
+    loggerTheme: "default",
+    enableFileLogging: false,
+    sampling: {
+      generalSamplingRate: 1.0,
+      profileSamplingRate: 1.0,
+      alwaysLogErrors: true,
+    },
+  };
+
   // Counter for log statistics
   private logCounter: Record<LogLevel, number> = {
     error: 0,
@@ -150,6 +162,68 @@ export class YuuLogService implements NestLoggerService {
   }
 
   /**
+   * Configure the logger options statically before initialization
+   *
+   * Use this method to configure the logger before creating a NestJS application
+   *
+   * @param options - Configuration options
+   *
+   * @example
+   * // In main.ts
+   * YuuLogService.configure({
+   *   appName: 'MyAPI',
+   *   logLevels: ['error', 'warn', 'info'],
+   *   loggerTheme: 'colorful',
+   *   enableFileLogging: true
+   * });
+   *
+   * const app = await NestFactory.create(AppModule, {
+   *   logger: YuuLogService.getNestLogger()
+   * });
+   */
+  static configure(options: YuuLogOptions): void {
+    YuuLogService.loggerOptions = {
+      ...YuuLogService.loggerOptions,
+      ...options,
+    };
+
+    // If there's an existing instance, update its options
+    if (YuuLogService.instance) {
+      YuuLogService.instance.options = {
+        ...YuuLogService.instance.options,
+        ...options,
+      };
+      YuuLogService.instance.loggerUtilities.setLoggerOptions(
+        YuuLogService.instance.options,
+      );
+      YuuLogService.instance.performanceProfiler.setOptions(
+        YuuLogService.instance.options,
+      );
+      YuuLogService.instance.enabledLogLevels = options.logLevels
+        ? [...options.logLevels]
+        : YuuLogService.instance.enabledLogLevels;
+
+      // Reinitialize the logger to apply the new configuration
+      YuuLogService.instance.reinitializeLogger();
+    }
+  }
+
+  /**
+   * Get the current logger options
+   *
+   * @returns The current logger options
+   *
+   * @example
+   * const options = YuuLogService.getOptions();
+   * console.log(`Current log levels: ${options.logLevels.join(', ')}`);
+   */
+  static getOptions(): YuuLogOptions {
+    return YuuLogService.instance
+      ? { ...YuuLogService.instance.options }
+      : { ...YuuLogService.loggerOptions };
+  }
+
+  /**
    * Check if a log level is enabled based on the current configuration
    *
    * @param level - The log level to check
@@ -205,7 +279,7 @@ export class YuuLogService implements NestLoggerService {
   static getLogger(): YuuLogService {
     if (!YuuLogService.instance) {
       // Create instances of required dependencies
-      const defaultOptions = {};
+      const defaultOptions = { ...YuuLogService.loggerOptions };
       const logFormatter = new LogFormatter(defaultOptions);
       const transportManager = new TransportManager(defaultOptions);
       const loggerUtilities = new LoggerUtilities(defaultOptions);
@@ -224,16 +298,26 @@ export class YuuLogService implements NestLoggerService {
   /**
    * Get a Winston logger instance configured for NestJS application
    *
+   * @param options - Optional configuration options to apply before creating the logger
    * @returns A NestJS compatible logger
    * @static
    *
    * @example
-   * // In bootstrap function
+   * // In bootstrap function with custom options
    * const app = await NestFactory.create(AppModule, {
-   *   logger: YuuLogService.getNestLogger()
+   *   logger: YuuLogService.getNestLogger({
+   *     appName: 'API Server',
+   *     logLevels: parseLogLevels('error,warn,info,verbose'),
+   *     loggerTheme: 'dark'
+   *   })
    * });
    */
-  static getNestLogger() {
+  static getNestLogger(options?: YuuLogOptions) {
+    // If options are provided, configure the logger first
+    if (options) {
+      YuuLogService.configure(options);
+    }
+
     const instance = YuuLogService.getLogger();
     return WinstonModule.createLogger({
       instance: instance.logger,

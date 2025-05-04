@@ -30,5 +30,5 @@
     "yuulog",
     "yuulogger"
   ],
-  "conventionalCommits.scopes": ["Release", "CI", "Format"]
+  "conventionalCommits.scopes": ["Release", "CI", "Format", "Logger"]
 }
