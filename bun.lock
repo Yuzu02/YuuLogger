@@ -1215,7 +1215,7 @@
 
     "reflect-metadata": ["reflect-metadata@0.2.2", "", {}, "sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q=="],
 
-    "release-please": ["release-please@17.0.0", "", { "dependencies": { "@conventional-commits/parser": "^0.4.1", "@google-automations/git-file-utils": "^3.0.0", "@iarna/toml": "^3.0.0", "@octokit/graphql": "^7.1.0", "@octokit/request": "^8.3.1", "@octokit/request-error": "^5.1.0", "@octokit/rest": "^20.1.1", "@types/npm-package-arg": "^6.1.0", "@xmldom/xmldom": "^0.8.4", "chalk": "^4.0.0", "code-suggester": "^5.0.0", "conventional-changelog-conventionalcommits": "^6.0.0", "conventional-changelog-writer": "^6.0.0", "conventional-commits-filter": "^3.0.0", "detect-indent": "^6.1.0", "diff": "^7.0.0", "figures": "^3.0.0", "http-proxy-agent": "^7.0.0", "https-proxy-agent": "^7.0.0", "js-yaml": "^4.0.0", "jsonpath-plus": "^10.0.0", "node-html-parser": "^6.0.0", "parse-github-repo-url": "^1.4.1", "semver": "^7.5.3", "type-fest": "^3.0.0", "typescript": "^4.6.4", "unist-util-visit": "^2.0.3", "unist-util-visit-parents": "^3.1.1", "xpath": "^0.0.34", "yaml": "^2.2.2", "yargs": "^17.0.0" }, "bin": { "release-please": "build/src/bin/release-please.js" } }, "sha512-XukWHHo9dTtVvJYD1JSbCtKhWEMIeyInqMniuA553ltvDkHHablAhIQkQjyCtNOCaHZwqqIn5OcJ+T2izb088w=="],
+    "release-please": ["release-please@17.1.1", "", { "dependencies": { "@conventional-commits/parser": "^0.4.1", "@google-automations/git-file-utils": "^3.0.0", "@iarna/toml": "^3.0.0", "@octokit/graphql": "^7.1.0", "@octokit/request": "^8.3.1", "@octokit/request-error": "^5.1.0", "@octokit/rest": "^20.1.1", "@types/npm-package-arg": "^6.1.0", "@xmldom/xmldom": "^0.8.4", "chalk": "^4.0.0", "code-suggester": "^5.0.0", "conventional-changelog-conventionalcommits": "^6.0.0", "conventional-changelog-writer": "^6.0.0", "conventional-commits-filter": "^3.0.0", "detect-indent": "^6.1.0", "diff": "^7.0.0", "figures": "^3.0.0", "http-proxy-agent": "^7.0.0", "https-proxy-agent": "^7.0.0", "js-yaml": "^4.0.0", "jsonpath-plus": "^10.0.0", "node-html-parser": "^6.0.0", "parse-github-repo-url": "^1.4.1", "semver": "^7.5.3", "type-fest": "^3.0.0", "typescript": "^4.6.4", "unist-util-visit": "^2.0.3", "unist-util-visit-parents": "^3.1.1", "xpath": "^0.0.34", "yaml": "^2.2.2", "yargs": "^17.0.0" }, "bin": { "release-please": "build/src/bin/release-please.js" } }, "sha512-baFGx79P5hGxbtDqf8p+ThwQjHT/byst6EtnCkjfA6FcK5UnaERn6TBI+8wSsaVIohPG2urYjZaPkITxDS3/Pw=="],
 
     "repeat-string": ["repeat-string@1.6.1", "", {}, "sha512-PV0dzCYDNfRi1jCDbJzpW7jNNDRuCOG/jI5ctQcGKt/clZD+YcPS3yIlWuTJMmESC8aevCFmWJy5wjAFgNqN6w=="],
 
@@ -1763,9 +1763,9 @@
 
     "release-please/chalk": ["chalk@4.1.2", "", { "dependencies": { "ansi-styles": "^4.1.0", "supports-color": "^7.1.0" } }, "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA=="],
 
-    "release-please/typescript": ["typescript@4.9.5", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g=="],
+    "release-please/semver": ["semver@7.7.2", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA=="],
 
-    "release-please/yaml": ["yaml@2.7.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-10ULxpnOCQXxJvBgxsn9ptjq6uviG/htZKk9veJGhlqn3w/DxQ631zFF+nlQXLwmImeS5amR2dl2U8sg6U9jsQ=="],
+    "release-please/typescript": ["typescript@4.9.5", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g=="],
 
     "restore-cursor/signal-exit": ["signal-exit@3.0.7", "", {}, "sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ=="],
 
