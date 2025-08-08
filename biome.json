@@ -3,10 +3,10 @@
   "vcs": {
     "enabled": false,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": false
   },
   "files": {
-    "ignoreUnknown": true,
+    "ignoreUnknown": false,
     "includes": ["src/**"]
   },
   "formatter": {
