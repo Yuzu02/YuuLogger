@@ -1,7 +1,7 @@
 # YuuLogger
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-0.0.1-green.svg)
+![Version](https://img.shields.io/badge/version-0.0.4-green.svg)
 
 A powerful, flexible, and performance-oriented logging library for NestJS applications. YuuLogger enhances your application with advanced logging capabilities, performance profiling, and beautiful console output.
 
@@ -25,6 +25,10 @@ A powerful, flexible, and performance-oriented logging library for NestJS applic
 
 ```bash
 npm install yuulogger --save
+
+yarn install yuulogger
+
+bun install -E yuulogger
 ```
 
 ## Quick Start
@@ -39,20 +43,60 @@ import { YuuLogModule } from 'yuulogger';
 @Module({
   imports: [
     YuuLogModule.forRoot({
-      appName: 'MyAwesomeApp',
+      appName: 'MyApp',
       logLevels: ['error', 'warn', 'info'],
       loggerTheme: 'colorful',
-      enableFileLogging: true,
-      // New sampling options for high-volume environments
-      sampling: {
-        generalSamplingRate: 0.5,   // Log 50% of general logs
-        profileSamplingRate: 1.0,   // Log 100% of performance profiles
-        alwaysLogErrors: true       // Always log all errors
-      }
+      enableFileLogging: true
     })
   ],
 })
 export class AppModule {}
+```
+
+### Async Configuration (Recommended)
+
+For production applications, use async configuration with environment variables:
+
+```typescript
+// app.module.ts
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { PerformanceInterceptor, YuuLogModule } from 'yuulogger';
+import { EnvModule } from './env/env.module';
+import { EnvService } from './env/env.service';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    EnvModule,
+    YuuLogModule.forRootAsync({
+      inject: [EnvService],
+      useFactory: (envService: EnvService) => ({
+        appName: envService.get('APP_NAME'),
+        loggerTheme: envService.get('LOGGER_THEME'),
+        logLevels: envService.get('LOG_LEVEL'),
+        enableFileLogging: envService.get('ENABLE_FILE_LOGGING'),
+        logtail: {
+          enabled: envService.get('ENABLE_LOGTAIL'),
+          sourceToken: envService.get('LOGTAIL_SOURCE_TOKEN'),
+          endpoint: envService.get('LOGTAIL_ENDPOINT'),
+        },
+      }),
+    }),
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: PerformanceInterceptor,
+    },
+  ],
+})
+export class AppModule {}
+```
+
 ```
 
 ### Use in main.ts
@@ -96,37 +140,58 @@ bootstrap();
 You can also configure YuuLogger to work with the NestJS global prefix and version:
 
 ```typescript
+### Use in main.ts
+
+```typescript
+// main.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { YuuLogService } from 'yuulogger';
+
+async function bootstrap() {
+  // Create the app with YuuLogger
+  const app = await NestFactory.create(AppModule, {
+    logger: YuuLogService.getNestLogger()
+  });
+  
+  const logger = YuuLogService.getLogger();
+  const port = process.env.PORT || 3000;
+  
+  await app.listen(port);
+  logger.log(`Application is running on: http://localhost:${port}`, 'Bootstrap');
+}
+bootstrap();
+```
+
+You can also configure YuuLogger to work with the NestJS global prefix and version:
+
+```typescript
 // main.ts with global prefix and versioning
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { YuuLogService, PerformanceInterceptor } from 'yuulogger';
+import { YuuLogService } from 'yuulogger';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   // Create the app with YuuLogger logger
   const app = await NestFactory.create(AppModule, {
-    logger: YuuLogService.getNestLogger({
-      appName: 'API Server',
-      logLevels: parseLogLevels('error,warn,info,verbose'),
-      loggerTheme: 'dark'
-    })
+    logger: YuuLogService.getNestLogger()
   });
   
-  // Get the logger for bootstrap operations
   const logger = YuuLogService.getLogger();
   
-  // Configure app with global prefix and versioning
+  // Set global prefix and versioning
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
   });
   
-  // Add global pipes, interceptors, etc.
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  app.useGlobalInterceptors(new PerformanceInterceptor());
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+  }));
   
-  // Start the application
   const port = process.env.PORT || 3000;
   await app.listen(port);
   
@@ -135,6 +200,11 @@ async function bootstrap() {
 bootstrap();
 ```
 
+```
+
+### Using in Services
+
+```typescript
 ### Using in Services
 
 ```typescript
@@ -145,23 +215,20 @@ import { YuuLogService } from 'yuulogger';
 @Injectable()
 export class UsersService {
   private readonly logger = YuuLogService.getLogger();
-  
+
   async createUser(userData: any) {
-    this.logger.log('Creating new user', 'UsersService');
-    
-    // Profile a database operation
-    const profileId = this.logger.startProfile('User Creation');
+    const profileId = this.logger.startProfile('Create User', 'UsersService');
     
     try {
-      // Your user creation logic here
-      this.logger.info(`User created: ${userData.email}`);
+      // Your business logic here
+      const user = await this.createUserInDatabase(userData);
       
-      return { success: true };
+      this.logger.log(`User created successfully: ${user.id}`, 'UsersService');
+      return user;
     } catch (error) {
-      this.logger.error('Failed to create user', error.stack, 'UsersService');
-      return { success: false, error: error.message };
+      this.logger.error(`Failed to create user: ${error.message}`, error.stack, 'UsersService');
+      throw error;
     } finally {
-      // Stop profiling and log results
       this.logger.stopProfile(profileId);
     }
   }

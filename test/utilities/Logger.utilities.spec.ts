@@ -201,6 +201,20 @@ describe("Logger Utilities", () => {
       expect(formatCpuUsage(cpuUsage)).toBe("User: 15.20ms, System: 5.50ms");
     });
 
+    it("should format very small CPU usage correctly", () => {
+      // Test very small values that would be 0.00ms
+      const smallCpuUsage = { user: 5, system: 8 };
+      expect(formatCpuUsage(smallCpuUsage)).toBe("User: 5μs, System: 8μs");
+
+      // Test zero values
+      const zeroCpuUsage = { user: 0, system: 0 };
+      expect(formatCpuUsage(zeroCpuUsage)).toBe("User: 0.00ms, System: 0.00ms");
+
+      // Test mixed values
+      const mixedCpuUsage = { user: 15200, system: 8 };
+      expect(formatCpuUsage(mixedCpuUsage)).toBe("User: 15.20ms, System: 8μs");
+    });
+
     it("should format memory usage correctly", () => {
       const memoryUsage = {
         rss: 50 * 1024 * 1024,

@@ -1,4 +1,4 @@
-import { UseInterceptors, applyDecorators } from "@nestjs/common";
+import { applyDecorators, UseInterceptors } from "@nestjs/common";
 import { PerformanceInterceptorOptions } from "../../interfaces/Performance.interface";
 import { PerformanceInterceptor } from "../interceptors/Performance.interceptor";
 

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import * as winston from "winston";
 import { ILogFormatter } from "../../interfaces/LogFormatter.interface";
 import {
@@ -6,6 +6,7 @@ import {
   StructuredLogEntry,
   YuuLogOptions,
 } from "../../interfaces/YuuLogger.interfaces";
+import { YUU_LOG_OPTIONS } from "../../YuuLogger.module";
 import { colors, loggerThemes } from "./Logger.themes";
 
 /**
@@ -24,7 +25,7 @@ export class LogFormatter implements ILogFormatter {
    *
    * @param options - Configuration options for the logger
    */
-  constructor(options: YuuLogOptions) {
+  constructor(@Inject(YUU_LOG_OPTIONS) options: YuuLogOptions) {
     this.options = options;
     this.pid = process.pid;
   }

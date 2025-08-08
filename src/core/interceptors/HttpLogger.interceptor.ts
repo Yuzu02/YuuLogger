@@ -1,5 +1,3 @@
-import { randomUUID } from "crypto";
-import { IncomingHttpHeaders } from "http";
 import {
   CallHandler,
   ExecutionContext,
@@ -7,15 +5,17 @@ import {
   Injectable,
   NestInterceptor,
 } from "@nestjs/common";
+import { randomUUID } from "crypto";
+import { IncomingHttpHeaders } from "http";
 import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
 import {
-  RequestType,
-  ResponseType,
   isExpressRequest,
   isExpressResponse,
   isFastifyRequest,
   isFastifyResponse,
+  RequestType,
+  ResponseType,
 } from "../../interfaces/Http.interface";
 import { HttpLoggerOptions } from "../../interfaces/httpLogger.interface";
 import { YuuLogService } from "../../services/YuuLogger.service";

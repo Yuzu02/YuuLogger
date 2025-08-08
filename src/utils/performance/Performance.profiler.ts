@@ -1,11 +1,12 @@
+import { Inject, Injectable, Optional } from "@nestjs/common";
 import { randomUUID } from "crypto";
-import { Injectable } from "@nestjs/common";
 import {
   IPerformanceProfiler,
   PerformanceMetrics,
   ProfileData,
 } from "../../interfaces/PerformanceProfiler.interface";
 import { YuuLogOptions } from "../../interfaces/YuuLogger.interfaces";
+import { YUU_LOG_OPTIONS } from "../../YuuLogger.module";
 import { loggerThemes } from "../logger/Logger.themes";
 import { LoggerUtilities } from "../logger/Logger.utilities";
 
@@ -18,7 +19,7 @@ import { LoggerUtilities } from "../logger/Logger.utilities";
 @Injectable()
 export class PerformanceProfiler implements IPerformanceProfiler {
   private options: YuuLogOptions;
-  private readonly loggerUtilities: LoggerUtilities;
+  private loggerUtilities: LoggerUtilities;
   private activeProfiles: Map<string, ProfileData> = new Map();
   private performanceMetrics: Map<string, PerformanceMetrics[]> = new Map();
 
@@ -40,11 +41,33 @@ export class PerformanceProfiler implements IPerformanceProfiler {
   /**
    * Creates a new PerformanceProfiler instance
    *
-   * @param options - Optional initial configuration options
+   * @param options - Configuration options for the logger
+   * @param loggerUtilities - The LoggerUtilities service
    */
-  constructor(options?: YuuLogOptions) {
+  constructor(
+    @Optional() @Inject(YUU_LOG_OPTIONS) options?: YuuLogOptions,
+    @Optional() loggerUtilities?: LoggerUtilities,
+  ) {
     this.options = { ...this.defaultOptions, ...(options || {}) };
-    this.loggerUtilities = new LoggerUtilities(this.options);
+    this.loggerUtilities = loggerUtilities || new LoggerUtilities(this.options);
+    this.loggerUtilities.setLoggerOptions(this.options);
+  }
+
+  /**
+   * Static factory method for creating instances without dependency injection
+   */
+  static create(
+    options?: YuuLogOptions,
+    loggerUtilities?: LoggerUtilities,
+  ): PerformanceProfiler {
+    const instance = Object.create(PerformanceProfiler.prototype);
+    instance.options = { ...instance.defaultOptions, ...(options || {}) };
+    instance.loggerUtilities =
+      loggerUtilities || new LoggerUtilities(instance.options);
+    instance.activeProfiles = new Map();
+    instance.performanceMetrics = new Map();
+    instance.loggerUtilities.setLoggerOptions(instance.options);
+    return instance;
   }
 
   /**
@@ -322,7 +345,8 @@ export class PerformanceProfiler implements IPerformanceProfiler {
       const initialCpu = profile.metadata._initialCpu as NodeJS.CpuUsage;
 
       const endMemory = process.memoryUsage();
-      const endCpu = process.cpuUsage();
+      // Use process.cpuUsage(previousValue) for more accurate difference calculation
+      const cpuDiff = process.cpuUsage(initialCpu);
 
       profile.memoryUsageDiff = {
         rss: endMemory.rss - initialMemory.rss,
@@ -332,8 +356,8 @@ export class PerformanceProfiler implements IPerformanceProfiler {
       };
 
       profile.cpuUsageDiff = {
-        user: endCpu.user - initialCpu.user,
-        system: endCpu.system - initialCpu.system,
+        user: cpuDiff.user,
+        system: cpuDiff.system,
       };
 
       // Remove internal properties from metadata
@@ -355,7 +379,8 @@ export class PerformanceProfiler implements IPerformanceProfiler {
             const initialCpu = child.metadata._initialCpu as NodeJS.CpuUsage;
 
             const endMemory = process.memoryUsage();
-            const endCpu = process.cpuUsage();
+            // Use process.cpuUsage(previousValue) for more accurate difference calculation
+            const cpuDiff = process.cpuUsage(initialCpu);
 
             child.memoryUsageDiff = {
               rss: endMemory.rss - initialMemory.rss,
@@ -365,8 +390,8 @@ export class PerformanceProfiler implements IPerformanceProfiler {
             };
 
             child.cpuUsageDiff = {
-              user: endCpu.user - initialCpu.user,
-              system: endCpu.system - initialCpu.system,
+              user: cpuDiff.user,
+              system: cpuDiff.system,
             };
 
             // Remove internal properties from metadata
