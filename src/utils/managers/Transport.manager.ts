@@ -1,9 +1,8 @@
-import * as crypto from "crypto";
 import { Logtail } from "@logtail/node";
 import { LogtailTransport } from "@logtail/winston";
-import { Injectable } from "@nestjs/common";
-import winston from "winston";
-import { transports } from "winston";
+import { Inject, Injectable, Optional } from "@nestjs/common";
+import * as crypto from "crypto";
+import winston, { transports } from "winston";
 import "winston-daily-rotate-file";
 import {
   CustomTransportConfig,
@@ -12,6 +11,7 @@ import {
   ITransportManager,
 } from "../../interfaces/TransportManager.interface";
 import { LogLevel, YuuLogOptions } from "../../interfaces/YuuLogger.interfaces";
+import { YUU_LOG_OPTIONS } from "../../YuuLogger.module";
 import { LogFormatter } from "../logger/Log.formatter";
 
 /**
@@ -34,10 +34,20 @@ const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
  */
 @Injectable()
 export class TransportManager implements ITransportManager {
-  private readonly options: YuuLogOptions;
+  private options: YuuLogOptions;
+  private logFormatter: LogFormatter;
   private logtail: Logtail | null = null;
   private enabledLogLevels: LogLevel[];
-  private logFormatter: LogFormatter;
+
+  /**
+   * Default options to use when none are provided
+   */
+  private defaultOptions: YuuLogOptions = {
+    appName: "NestJS",
+    logLevels: ["error", "warn", "info"],
+    loggerTheme: "default",
+    enableFileLogging: false,
+  };
 
   // Default file transport configuration
   private fileTransportConfig: FileTransportConfig = {
@@ -68,17 +78,40 @@ export class TransportManager implements ITransportManager {
    * @param options - Configuration options for the logger
    * @param logFormatter - The LogFormatter to use for log formatting
    */
-  constructor(options: YuuLogOptions, logFormatter?: LogFormatter) {
-    this.options = options;
+  constructor(
+    @Optional() @Inject(YUU_LOG_OPTIONS) options: YuuLogOptions = {},
+    @Optional() logFormatter?: LogFormatter,
+  ) {
+    this.options = { ...this.defaultOptions, ...options };
     this.enabledLogLevels = [
-      ...(options.logLevels || ["error", "warn", "info"]),
+      ...(this.options.logLevels ||
+        this.defaultOptions.logLevels || ["error", "warn", "info"]),
     ];
-
-    // If a LogFormatter is provided, use it; otherwise create a new one
-    this.logFormatter = logFormatter || new LogFormatter(options);
-
-    // Initialize Logtail if configured
+    this.logFormatter = logFormatter || new LogFormatter(this.options);
+    this.customTransports = new Map();
     this.initializeLogtail();
+  }
+
+  /**
+   * Static factory method for creating instances without dependency injection
+   */
+  static create(
+    options?: YuuLogOptions,
+    logFormatter?: LogFormatter,
+  ): TransportManager {
+    const instance = Object.create(TransportManager.prototype);
+    instance.options = options || {
+      appName: "NestJS",
+      logLevels: ["error", "warn", "info"],
+    };
+    instance.enabledLogLevels = [
+      ...(instance.options.logLevels || ["error", "warn", "info"]),
+    ];
+    instance.logFormatter = logFormatter || new LogFormatter(instance.options);
+    instance.customTransports = new Map();
+    instance.logtail = null;
+    instance.initializeLogtail();
+    return instance;
   }
 
   /**
@@ -86,7 +119,7 @@ export class TransportManager implements ITransportManager {
    *
    * @private
    */
-  private initializeLogtail(): void {
+  initializeLogtail(): void {
     if (
       this.options.logtail?.sourceToken &&
       this.options.logtail?.endpoint &&

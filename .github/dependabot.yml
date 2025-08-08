@@ -1,7 +1,7 @@
 version: 2
 updates:
-  # Keep npm dependencies up to date
-  - package-ecosystem: "npm"
+  # Keep bun dependencies up to date
+  - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -10,7 +10,7 @@ updates:
     # Use specific labels on Dependabot PRs
     labels:
       - "dependencies"
-      - "npm"
+      - "bun"
     # Assign compatible versions according to semver
     versioning-strategy: auto
     # Group minor and patch updates

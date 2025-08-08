@@ -9,7 +9,6 @@ import { WinstonModule } from "nest-winston";
 import * as winston from "winston";
 import { createLogger, format } from "winston";
 import "winston-daily-rotate-file";
-import { YUU_LOG_OPTIONS } from "../YuuLogger.module";
 import {
   PerformanceMetrics,
   ProfileData,
@@ -20,8 +19,8 @@ import {
   FileTransportConfig,
 } from "../interfaces/TransportManager.interface";
 import {
-  LogLevel,
   LoggerTheme,
+  LogLevel,
   StructuredLogEntry,
   YuuLogOptions,
 } from "../interfaces/YuuLogger.interfaces";
@@ -30,6 +29,7 @@ import { loggerThemes } from "../utils/logger/Logger.themes";
 import { LoggerUtilities } from "../utils/logger/Logger.utilities";
 import { TransportManager } from "../utils/managers/Transport.manager";
 import { PerformanceProfiler } from "../utils/performance/Performance.profiler";
+import { YUU_LOG_OPTIONS } from "../YuuLogger.module";
 
 /**
  * Types of log messages that can be handled by the logger
@@ -281,9 +281,15 @@ export class YuuLogService implements NestLoggerService {
       // Create instances of required dependencies
       const defaultOptions = { ...YuuLogService.loggerOptions };
       const logFormatter = new LogFormatter(defaultOptions);
-      const transportManager = new TransportManager(defaultOptions);
+      const transportManager = TransportManager.create(
+        defaultOptions,
+        logFormatter,
+      );
       const loggerUtilities = new LoggerUtilities(defaultOptions);
-      const performanceProfiler = new PerformanceProfiler(defaultOptions);
+      const performanceProfiler = PerformanceProfiler.create(
+        defaultOptions,
+        loggerUtilities,
+      );
       YuuLogService.instance = new YuuLogService(
         defaultOptions,
         logFormatter,

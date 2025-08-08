@@ -110,7 +110,19 @@ export class LoggerUtilities implements ILoggerUtilities {
    * @returns Formatted CPU usage string
    */
   formatCpuUsage(cpuUsage: NodeJS.CpuUsage): string {
-    return `User: ${(cpuUsage.user / 1000).toFixed(2)}ms, System: ${(cpuUsage.system / 1000).toFixed(2)}ms`;
+    // Convert from microseconds to milliseconds
+    const userMs = cpuUsage.user / 1000;
+    const systemMs = cpuUsage.system / 1000;
+
+    // For very small values, show microseconds instead of 0.00ms
+    const formatValue = (value: number, originalMicroseconds: number) => {
+      if (value < 0.01 && originalMicroseconds > 0) {
+        return `${originalMicroseconds.toFixed(0)}μs`;
+      }
+      return `${value.toFixed(2)}ms`;
+    };
+
+    return `User: ${formatValue(userMs, cpuUsage.user)}, System: ${formatValue(systemMs, cpuUsage.system)}`;
   }
 
   /**
@@ -315,7 +327,7 @@ export class LoggerUtilities implements ILoggerUtilities {
     // Add CPU usage if available
     if (profile.cpuUsageDiff) {
       if (resourceUsage) resourceUsage += "\n";
-      resourceUsage += `${colors.bold}CPU:${colors.reset} ${theme.context}User: ${(profile.cpuUsageDiff.user / 1000).toFixed(2)}ms, System: ${(profile.cpuUsageDiff.system / 1000).toFixed(2)}ms${colors.reset}`;
+      resourceUsage += `${colors.bold}CPU:${colors.reset} ${this.formatCpuUsage(profile.cpuUsageDiff)}`;
     }
 
     // Add metadata if available (format it nicely)

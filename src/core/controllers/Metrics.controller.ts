@@ -1,9 +1,9 @@
-import * as os from "os";
 import { Controller, Get, Header, Inject, Optional } from "@nestjs/common";
-import { YUU_LOG_OPTIONS } from "../../YuuLogger.module";
+import * as os from "os";
 import { SystemInfo } from "../../interfaces/SystemInfo.interface";
 import { YuuLogOptions } from "../../interfaces/YuuLogger.interfaces";
 import { YuuLogService } from "../../services/YuuLogger.service";
+import { YUU_LOG_OPTIONS } from "../../YuuLogger.module";
 
 /**
  * Controller to expose metrics and statistics

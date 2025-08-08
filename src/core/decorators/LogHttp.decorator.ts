@@ -1,4 +1,4 @@
-import { UseInterceptors, applyDecorators } from "@nestjs/common";
+import { applyDecorators, UseInterceptors } from "@nestjs/common";
 import { HttpLoggerOptions } from "../../interfaces/httpLogger.interface";
 import { HttpLoggerInterceptor } from "../interceptors/HttpLogger.interceptor";
 
